@@ -61,8 +61,8 @@ Proof.
   suff: P \/ ~ P.
   case.
   move=> p.
-  exact: (or_intror (pq p)).
-  by apply: or_introl.
+  by right ; apply (pq p).
+  by left.
   apply: ((comp dne_imp_dmlnan peirce_imp_dne) prc).
   by apply: and_rect.
 Qed.
