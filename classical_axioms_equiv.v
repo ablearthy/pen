@@ -69,9 +69,6 @@ Qed.
 
 (* ------------------------------------------------------------------------- *)
 
-Definition comp4 {A B C D E} (a : A -> B) (b : B -> C) (c : C -> D) (d : D -> E)
-  := comp d (comp c (comp b a)).
-
 Theorem peirce_iff_dne : peirce <-> dne.
 Proof.
   split.
@@ -82,7 +79,11 @@ Qed.
 Theorem dne_iff_lem : dne <-> lem.
 Proof.
   split.
-  exact: comp4 dne_imp_dmlnan dmlnan_imp_peirce peirce_imp_implies_to_or implies_to_or_imp_lem.
+  rewrite -peirce_iff_dne.
+  move=> p.
+  apply: implies_to_or_imp_lem.
+  apply: peirce_imp_implies_to_or.
+  by [].
   exact: lem_imp_dne.
 Qed.
 
