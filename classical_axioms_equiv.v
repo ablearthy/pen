@@ -31,19 +31,13 @@ Qed.
 
 Lemma dne_imp_dmlnan : dne -> dmlnan.
 Proof.
-  move=> d P Q.
-  suff:  ~ (P \/ Q) -> ~ ~ (~ P /\ ~ Q).
-  move=> tmp1 tmp2.
-  move: (contra_not tmp1)=> tmp3.
+  move=> d P Q p.
   apply: d.
-  apply: tmp3.
-  apply: not_not_intro.
-  by [].
-  move=> tmp1.
-  apply: not_not_intro.
-  apply: conj.
-  exact: (fun x => tmp1 (or_introl x)).
-  exact: (fun x => tmp1 (or_intror x)).
+  move: p.
+  apply: contra_not.
+  split.
+  by move=> /or_introl.
+  by move=> /or_intror.
 Qed.
 
 Lemma lem_imp_dne : lem -> dne.
