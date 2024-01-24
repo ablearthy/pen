@@ -43,10 +43,7 @@ Qed.
 Lemma lem_imp_dne : lem -> dne.
 Proof.
     move=> l P.
-    case: (l P).
-    by [].
-    move=> f1 f2.
-    exact ((comp (False_ind P) f2) f1).
+    by case: (l P).
 Qed.
 
 Lemma implies_to_or_imp_lem : implies_to_or -> lem.
