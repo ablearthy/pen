@@ -63,7 +63,8 @@ Proof.
   move=> p.
   exact: (or_intror (pq p)).
   by apply: or_introl.
-  exact: (((comp dne_imp_dmlnan peirce_imp_dne) prc) P (~ P) (fun (x : (~ P /\ ~ ~ P)) => (proj2 x) (proj1 x))).
+  apply: ((comp dne_imp_dmlnan peirce_imp_dne) prc).
+  by apply: and_rect.
 Qed.
 
 (* ------------------------------------------------------------------------- *)
