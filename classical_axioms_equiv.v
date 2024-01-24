@@ -16,7 +16,8 @@ Definition const [P Q : Prop] (a : P) (b : Q) := a.
 Lemma peirce_imp_dne : peirce -> dne.
 Proof.
   move=> prc P f.
-  exact: (prc P False (comp (False_ind P) f)).
+  apply: prc.
+  by move=> /f.
 Qed.
 
 Lemma dmlnan_imp_peirce : dmlnan -> peirce.
