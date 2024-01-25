@@ -138,8 +138,7 @@ Lemma succ_max_distr_r n m : (maxn n m).+1 = maxn (n.+1) (m.+1).
 Proof.
   rewrite /maxn.
   case: leqP.
-  move=> h.
-  by rewrite ltnNge ltnS h /negb.
+  by rewrite ltnNge ltnS =>->//.
   move=> n_le_m.
   suff: n.+1 < m.+1.
   by move=>->.
