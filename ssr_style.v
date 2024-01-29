@@ -350,3 +350,29 @@ Proof.
   by apply: gorgeous_refl'.
 Qed.
 
+(* Trees *)
+
+Inductive tree := leaf | node of tree & tree.
+
+Fixpoint height t := if t is node l r then (maxn (height l) (height r)).+1 else 0.
+
+Fixpoint leaves t := if t is node l r then (leaves l + leaves r) else 1.
+
+Fixpoint complete t := if t is node l r then complete l && complete r && (height l == height r) else true.
+
+Theorem complete_leaves_height t : complete t -> leaves t = 2 ^ (height t).
+Proof.
+  elim: t=> //=.
+  move=> t H1 t' H2.
+  do?[move/andP ; case].
+  rewrite expnSr muln2 -addnn.
+  move=> CT CT' /eqP H3.
+  move: H3 H1=>-> H1.
+  rewrite maxnn.
+  suff: (leaves t = 2 ^ height t') /\ (leaves t' = 2 ^ height t').
+  case.
+  by move=>-> ->.
+  split.
+  by apply: H1.
+  by apply: H2.
+Qed.
