@@ -202,3 +202,24 @@ Proof.
   elim: e acc=>[|l IL r RL acc]//=.
   by rewrite (RL (eval_expr_acc' acc l)) (IL acc) addnA [eval_expr r + eval_expr l]addnC.
 Qed.
+
+(* CPS evaluator *)
+
+Fixpoint eval_expr_cont' {A} (k : nat -> A) (e : expr) : A :=
+  match e with
+  | Const n => k n
+  | Plus l r => eval_expr_cont' (fun n1 => eval_expr_cont' (fun n2 => k (n1 + n2)) l) r
+  end.
+
+Definition eval_expr_cont := eval_expr_cont' id.
+
+Lemma eval_expr_cont'_correct {A} (k : nat -> A) (e : expr) : eval_expr_cont' k e = k (eval_expr e).
+Proof.
+  elim: e k=>[|l IL r RL k] //=.
+  by rewrite (RL (fun n1 : nat => eval_expr_cont' (fun n2 : nat => k (n1 + n2)) l)) (IL ((fun n2 : nat => k (eval_expr r + n2)))) addnC.
+Qed.
+
+Theorem eval_expr_cont_correct (e : expr) : eval_expr_cont e = eval_expr e.
+Proof.
+  by rewrite /eval_expr_cont eval_expr_cont'_correct.
+Qed.
