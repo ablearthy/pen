@@ -77,3 +77,33 @@ Theorem sum_tail_correct (l : seq nat) : sum_tail l = sum l.
 Proof.
   by rewrite -[sum _]add0n /sum_tail sum_tail'_correct.
 Qed.
+
+(* CPS sum *)
+
+Fixpoint sum_cont' {A} (k : nat -> A) (l : seq nat) : A :=
+  match l with
+  | [::] => k 0
+  | x :: xs => sum_cont' (fun ans => k (x + ans)) xs
+  end.
+    
+Definition sum_cont := sum_cont' id.
+
+Theorem sum_cont_correct (l : seq nat) : sum_cont l = sum l.
+Proof.
+  elim: l=>//=.
+  rewrite /sum_cont=>//=.
+Abort.
+
+Theorem sum_cont'_correct {A} l (k : nat -> A) : sum_cont' k l = k (sum l).
+Proof.
+  elim: l k=>//=.
+  (* by [].
+  move=> x xs IH k /=.
+  by rewrite (IH (fun ans : nat => k (x + ans))). *)
+Qed.
+
+Theorem sum_cont_correct (l : seq nat) : sum_cont l = sum l.
+Proof.
+  by rewrite /sum_cont sum_cont'_correct.
+Qed.
+
