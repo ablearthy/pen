@@ -107,3 +107,42 @@ Proof.
   by rewrite /sum_cont sum_cont'_correct.
 Qed.
 
+(* Reverse *)
+
+Fixpoint rev {A} (l : seq A) : seq A :=
+  match l with
+  | [::] => [::]
+  | x :: xs => rev xs ++ [::x]
+  end.
+    
+Fixpoint rev_tail' {A} (acc : seq A) (l : seq A) : seq A :=
+  match l with
+  | [::] => acc
+  | x :: xs => rev_tail' (x :: acc) xs
+  end.
+    
+Definition rev_tail {A} (l : seq A) := rev_tail' [::] l.
+
+Theorem rev_tail_correct {A} (l : seq A) : rev_tail l = rev l.
+Proof.
+  elim: l=>//=.
+  move=> x xs IH.
+Abort.
+
+Locate "_ ++ _".
+Print cat.
+(*
+  cat [] s2 = s2
+  cat (x:xs) s2 = x : (cat xs s2)
+*)
+
+Lemma rev_tail'_correct {A} (l : seq A) acc : rev_tail' acc l = (rev l) ++ acc.
+Proof.
+  elim: l acc=>[| x xs IH acc] //=.
+  by rewrite (IH (x :: acc)) -catA=>//=.
+Qed.
+
+Theorem rev_tail_correct {A} (l : seq A) : rev_tail l = rev l.
+Proof.
+  by rewrite /rev_tail rev_tail'_correct cats0.
+Qed.
