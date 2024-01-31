@@ -146,3 +146,33 @@ Theorem rev_tail_correct {A} (l : seq A) : rev_tail l = rev l.
 Proof.
   by rewrite /rev_tail rev_tail'_correct cats0.
 Qed.
+
+(* Map *)
+
+Fixpoint map {A B} (f : A -> B) (xs : seq A) : seq B :=
+  match xs with
+  | [::] => [::]
+  | x :: xs' => f x :: (map f xs')
+  end.
+    
+Fixpoint map_tail' {A B} (acc : seq B) (f : A -> B) (xs : seq A) : seq B :=
+  match xs with
+  | [::] => rev_tail acc
+  | x :: xs' => map_tail' (f x :: acc) f xs'
+  end.
+
+Definition map_tail {A B} (f : A -> B) l := map_tail' [::] f l.
+
+Lemma map_tail'_correct {A B} (f : A -> B) (acc : seq B) (xs : seq A) : map_tail' acc f xs = rev_tail acc ++ (map f xs).
+Proof.
+  elim: xs acc=>//=.
+  move=> acc.
+  by rewrite cats0.
+  move=> x xs IH acc.
+  by rewrite (IH (f x :: acc)) /rev_tail rev_tail'_correct cats0 rev_tail'_correct cats0 -catA.
+Qed.
+
+Theorem map_tail_correct {A B} (f : A -> B) (l : seq A) : map_tail f l = map f l.
+Proof.
+  by rewrite /map_tail map_tail'_correct.
+Qed.
