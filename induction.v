@@ -176,3 +176,29 @@ Theorem map_tail_correct {A B} (f : A -> B) (l : seq A) : map_tail f l = map f l
 Proof.
   by rewrite /map_tail map_tail'_correct.
 Qed.
+
+(* Arithmetic expression language *)
+
+Inductive expr : Type :=
+  | Const of nat
+  | Plus of expr & expr.
+    
+Fixpoint eval_expr (e : expr) : nat :=
+  match e with
+  | Const p => p
+  | Plus l r => (eval_expr l) + (eval_expr r)
+  end.
+    
+Fixpoint eval_expr_acc' (acc : nat) (e : expr) : nat :=
+  match e with
+  | Const n => n + acc
+  | Plus l r => eval_expr_acc' (eval_expr_acc' acc l) r
+  end.
+
+Definition eval_expr' := eval_expr_acc' 0.
+
+Lemma eval_expr_acc'_correct (e : expr) (acc : nat) : eval_expr_acc' acc e = eval_expr e + acc.
+Proof.
+  elim: e acc=>[|l IL r RL acc]//=.
+  by rewrite (RL (eval_expr_acc' acc l)) (IL acc) addnA [eval_expr r + eval_expr l]addnC.
+Qed.
