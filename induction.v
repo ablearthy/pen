@@ -223,3 +223,53 @@ Theorem eval_expr_cont_correct (e : expr) : eval_expr_cont e = eval_expr e.
 Proof.
   by rewrite /eval_expr_cont eval_expr_cont'_correct.
 Qed.
+
+(* Stack *)
+
+Inductive instr :=
+  | push of nat
+  | add.
+
+Definition prog := seq instr.
+Definition stack := seq nat.
+
+Fixpoint run (s : stack) (p : prog) : stack :=
+  match p with
+  | [::] => s
+  | i :: xs => let s' :=
+                 match i with
+                   | push n => n :: s
+                   | add => match s with
+                            | l :: r :: s' => (l + r) :: s'
+                            | _ => s
+                            end
+                 end in run s' xs
+  end.
+                  
+Fixpoint compile (e : expr) : prog :=
+  match e with
+  | Const n => [:: push n]
+  | Plus l r => (compile l) ++ (compile r) ++ [::add]
+  end.
+    
+Theorem compile_correct (e : expr) : run [::] (compile e) = [::eval_expr e].
+Abort.
+
+Goal forall e acc, run acc (compile e) = (eval_expr e)::acc.
+Proof.
+  elim=>[|l IL r IR acc]//=.
+Abort.
+
+Theorem compile'_correct (e : expr) (acc : stack) (prog : prog) :
+  run acc ((compile e) ++ prog) = run ((eval_expr e)::acc) prog.
+Proof.
+  elim: e acc prog=> [|l IL r IR acc prog]//=.
+  rewrite -catA IL.
+  rewrite -catA IR=>//=.
+  by rewrite addnC.
+Qed.
+
+Theorem compile_correct (e : expr) : run [::] (compile e) = [::eval_expr e].
+Proof.
+  by rewrite -[(compile e)]cats0 compile'_correct=>//=.
+Qed.
