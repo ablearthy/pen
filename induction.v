@@ -273,3 +273,64 @@ Theorem compile_correct (e : expr) : run [::] (compile e) = [::eval_expr e].
 Proof.
   by rewrite -[(compile e)]cats0 compile'_correct=>//=.
 Qed.
+
+(* Fib *)
+
+Fixpoint fib (n : nat) :=
+  match n with
+  | 0 => 0
+  | n'.+1 => match n' with
+             | 0 => 1
+             | n''.+1 => fib n' + fib n''
+             end
+  end.
+
+Fixpoint fib_tail' (a b n : nat) : nat :=
+  match n with
+  | 0 => a
+  | n.+1 => fib_tail' b (a + b) n
+  end.
+    
+Definition fib_tail := fib_tail' 0 1.
+
+(*
+    fib_tail a b 5
+  = fib_tail b (a + b) 4
+  = fib_tail (a + b) (a + 2 b) 3
+  = fib_tail (a + 2b) (2a + 3b) 2
+  = fib_tail (2a + 3b) (3a + 5b) 1
+  = fib_tail (3a + 5b) _ 0
+  = 3a + 5b
+  
+  a = 43
+  b = 827
+  n = 6
+*)
+
+Eval compute in ((fib 6) * 43 + (fib 7) * 827).
+Eval compute in (fib_tail' 43 827 7).
+
+Theorem fib_tail_correct (n : nat) : fib_tail n = fib n.
+Abort.
+
+Lemma expand_fib_tail' (n a b : nat) : fib_tail' a b n.+1 = fib_tail' b (a + b) n.
+Proof. by []. Qed.
+
+Lemma expand_fib (n : nat) : fib n.+2 = fib n.+1 + fib n.
+Proof. by []. Qed.
+
+Theorem fib_tail'_correct (n a b : nat) : fib_tail' a b n.+1 = (fib n) * a + (fib n.+1) * b.
+Proof.
+  elim: n a b=>[|n IH a b]//.
+  - move=> a b.
+    by rewrite mul0n mul1n.
+  rewrite expand_fib_tail' IH expand_fib.
+  by ring.
+Qed.
+  
+Theorem fib_tail_correct (n : nat) : fib_tail n = fib n.
+Proof.
+  case: n=> [|n]//.
+  rewrite /fib_tail fib_tail'_correct.
+  by ring.
+Qed.
